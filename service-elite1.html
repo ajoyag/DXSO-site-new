@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>DXSO Elite | Enterprise XDR & Intelligence</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/tl.png">
+    
+    <!-- Professional Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            --brand-accent: #10b981;
+            --brand-accent-glow: rgba(16, 185, 129, 0.2);
+            --brand-bg: #020617;
+            --brand-surface: rgba(15, 23, 42, 0.6);
+            --brand-surface-bright: rgba(30, 41, 59, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.06);
+            --glass-blur: blur(12px);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        body {
+            background-color: var(--brand-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- PREMIUM BACKGROUND ENGINE --- */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .bg-glass-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
+        }
+
+        .glass-orb {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, var(--brand-accent-glow) 0%, transparent 70%);
+            filter: blur(100px); opacity: 0.3;
+            animation: floatOrb 25s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 45vw; height: 45vw; top: -15%; left: -10%; }
+        .orb-2 { width: 55vw; height: 55vw; bottom: -25%; right: -10%; animation-duration: 40s; animation-delay: -8s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(8vw, 12vh) scale(1.05); }
+        }
+
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px; z-index: 1; pointer-events: none; opacity: 0.08;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+        .section { padding: 120px 0; position: relative; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .text-accent { color: var(--brand-accent); }
+        h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.03em; color: white; }
+
+        .tagline {
+            display: inline-flex; align-items: center; gap: 12px;
+            font-family: 'JetBrains Mono'; font-size: 0.7rem; font-weight: 700;
+            color: var(--brand-accent); text-transform: uppercase; letter-spacing: 3px;
+            margin-bottom: 24px;
+        }
+        .tagline::before { content: ""; width: 24px; height: 1px; background: var(--brand-accent); opacity: 0.4; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 16px 36px; background: var(--brand-accent); color: var(--brand-bg);
+            font-weight: 600; font-size: 0.85rem; border-radius: 4px;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; gap: 10px;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -5px var(--brand-accent-glow); background: #14cf91; }
+        
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); color: white;
+            backdrop-filter: var(--glass-blur);
+        }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.3); }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 28px 0; transition: 0.5s;
+        }
+        .navbar.scrolled {
+            background: rgba(2, 6, 23, 0.85); padding: 18px 0;
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+        }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        .logo img { height: 40px; width: auto; display: block; }
+        
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-link { 
+            font-size: 0.75rem; font-weight: 500; color: var(--text-muted); 
+            letter-spacing: 0.8px; transition: 0.3s; text-transform: uppercase;
+            text-decoration: none;
+        }
+        .nav-link:hover, .nav-link.active { color: white; }
+
+        .nav-dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 0;
+            background: #0f172a; border: 1px solid var(--border);
+            padding: 10px; min-width: 260px; display: none; flex-direction: column;
+            border-radius: 4px; margin-top: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+        }
+        .dropdown-menu a {
+            padding: 14px 20px; font-size: 0.7rem; color: var(--text-muted); border-radius: 2px;
+            font-family: 'JetBrains Mono'; text-transform: uppercase; text-decoration: none;
+        }
+        .dropdown-menu a:hover { color: white; background: rgba(255,255,255,0.03); }
+        .nav-dropdown:hover .dropdown-menu { display: flex; }
+
+        /* --- HERO --- */
+        .hero { padding: 220px 0 100px; text-align: center; }
+        .hero-title { font-size: clamp(2.5rem, 6vw, 4.8rem); line-height: 1.05; margin-bottom: 24px; font-weight: 800; }
+        .hero-desc { font-size: 1.15rem; color: var(--text-muted); max-width: 760px; margin: 0 auto 48px; font-weight: 300; line-height: 1.6; }
+
+        /* --- PILLARS --- */
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 80px; }
+        .pillar-item { padding: 30px; border-left: 1px solid var(--border); transition: 0.4s; }
+        .pillar-item:hover { border-left-color: var(--brand-accent); background: rgba(255,255,255,0.01); }
+        .pillar-item h4 { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--brand-accent); margin-bottom: 12px; letter-spacing: 1px; }
+        .pillar-item p { font-size: 0.9rem; color: var(--text-muted); font-weight: 300; line-height: 1.6; }
+
+        /* --- ARCHITECTURE --- */
+        .arch-wrap { margin-top: 80px; padding: 80px 40px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); border-radius: 8px; position: relative; overflow: hidden; }
+        .arch-grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.2; pointer-events: none; }
+        
+        .arch-viz { width: 100%; max-width: 900px; margin: 0 auto; display: block; position: relative; z-index: 2; }
+        .svg-node { fill: #0f172a; stroke: var(--border); stroke-width: 1; rx: 6; }
+        .svg-node-prime { fill: rgba(16, 185, 129, 0.05); stroke: var(--brand-accent); stroke-width: 1.5; rx: 10; }
+        .svg-text-main { font-family: 'Inter'; font-size: 13px; fill: white; text-anchor: middle; font-weight: 600; }
+        .svg-text-accent { font-family: 'JetBrains Mono'; font-size: 16px; fill: var(--brand-accent); text-anchor: middle; font-weight: 700; }
+        .svg-text-dim { font-family: 'Inter'; font-size: 11px; fill: var(--text-muted); text-anchor: middle; }
+        .pulse-line { stroke: var(--brand-accent); stroke-width: 1.2; stroke-dasharray: 8; animation: dash 3s linear infinite; opacity: 0.6; }
+        @keyframes dash { to { stroke-dashoffset: -100; } }
+
+        /* --- CAPABILITIES --- */
+        .cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .cap-card {
+            background: var(--brand-surface); border: 1px solid var(--border);
+            padding: 50px 35px; border-radius: 4px; backdrop-filter: var(--glass-blur);
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column;
+        }
+        .cap-card:hover { border-color: var(--brand-accent); transform: translateY(-8px); background: var(--brand-surface-bright); }
+        .cap-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--brand-accent); margin-bottom: 28px; transition: 0.3s; }
+        .cap-card h3 { font-size: 1.4rem; margin-bottom: 16px; }
+        .cap-card p { color: var(--text-muted); font-size: 0.95rem; font-weight: 300; line-height: 1.7; }
+
+        /* --- SPECS --- */
+        .specs-wrap { background: var(--brand-surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; backdrop-filter: var(--glass-blur); }
+        .spec-item { display: grid; grid-template-columns: 1fr 1.5fr; padding: 30px 48px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.3s; }
+        .spec-item:hover { background: rgba(255,255,255,0.02); }
+        .spec-item:last-child { border-bottom: none; }
+        .spec-label { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--brand-accent); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+        .spec-value { color: white; font-size: 1rem; font-weight: 300; text-align: right; }
+
+        /* --- CTA --- */
+        .cta-section { padding: 120px 0; border-top: 1px solid var(--border); text-align: center; background: rgba(255,255,255,0.01); }
+        .cta-content h2 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 24px; }
+        .cta-content p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 48px; font-weight: 300; max-width: 650px; margin-left: auto; margin-right: auto; }
+
+        /* --- FOOTER --- */
+        footer { padding: 100px 0 50px; border-top: 1px solid var(--border); background: #010409; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; }
+        .footer-col h5 { margin-bottom: 24px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--brand-accent); font-weight: 700; }
+        .footer-link { display: block; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted); transition: 0.3s; text-decoration: none; }
+        .footer-link:hover { color: white; transform: translateX(5px); }
+
+        /* --- RESPONSIVENESS --- */
+        @media (max-width: 1024px) {
+            .cap-grid, .footer-grid { grid-template-columns: repeat(2, 1fr); }
+            .pillars-grid { grid-template-columns: 1fr; gap: 0; }
+            .pillar-item { border-left: none; border-bottom: 1px solid var(--border); padding: 30px 0; }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .hero { padding-top: 160px; }
+            .hero-title { font-size: 2.8rem; }
+            .nav-links { display: none; }
+            #m-toggle { display: block !important; }
+            .cap-grid, .footer-grid { grid-template-columns: 1fr; }
+            .spec-item { grid-template-columns: 1fr; gap: 8px; padding: 24px; }
+            .spec-value { text-align: left; }
+            .arch-wrap { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Premium Dynamic Background -->
+    <div class="bg-glass-layer">
+        <div class="glass-orb orb-1"></div>
+        <div class="glass-orb orb-2"></div>
+    </div>
+    <div class="bg-mesh"></div>
+    <div class="bg-grid"></div>
+
+    <!-- Navigation (Unified) -->
+    <nav class="navbar" id="nav">
+        <div class="container nav-flex">
+            <a href="index.html" class="logo">
+                <img src="assets/images/lo.png" alt="DXSO Logo">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#about" class="nav-link">Intelligence</a>
+                <div class="nav-dropdown">
+                    <a href="index.html#services" class="nav-link active">Managed Services ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="service-protect.html">Managed EDR (Protect)</a>
+                        <a href="service-elite.html">Managed XDR (Elite)</a>
+                        <a href="service-premium.html">Managed SOC (Premium)</a>
+                    </div>
+                </div>
+                <a href="index.html#industries" class="nav-link">Industries</a>
+                <a href="index.html#process" class="nav-link">Operations</a>
+                <a href="portal-login.html" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.7rem;">Portal Login</a>
+            </div>
+            <div id="m-toggle" style="display:none; color:white; font-size:1.8rem; cursor:pointer; z-index:1001;" onclick="toggleMobileMenu()">☰</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="tagline gs-fade">ENTERPRISE XDR LAYER</div>
+            <h1 class="hero-title gs-up">DXSO Elite</h1>
+            <p class="hero-desc gs-up">
+                Intermediate Security with XDR. Extends endpoint security with advanced detection, correlation, and visibility across multiple layers (Endpoint, Network, Cloud, Email). Optimized for high-growth mid-market organizations and tactical resilience.
+            </p>
+            <div class="gs-up">
+                <a href="index.html#contact" class="btn">Establish Elite Uplink <i data-lucide="zap"></i></a>
+                <a href="#specs" class="btn btn-outline" style="margin-left: 15px;">Operational Specs</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pillars -->
+    <section class="container">
+        <div class="pillars-grid gs-up">
+            <div class="pillar-item">
+                <h4>01 / CROSS-LAYER CORRELATION</h4>
+                <p>Break down visibility silos between email traffic, network nodes, and endpoint clusters to identify complex adversarial movement.</p>
+            </div>
+            <div class="pillar-item">
+                <h4>02 / ASSISTED SEC-OPS</h4>
+                <p>Augment internal defense teams with automated incident playbooks and elite threat hunting guidance from DXSO analysts.</p>
+            </div>
+            <div class="pillar-item">
+                <h4>03 / FRAMEWORK ALIGNMENT</h4>
+                <p>Fully mapped to MITRE ATT&CK® protocols to provide contextual intelligence for every detected signal and pattern.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="section" style="background: rgba(2,6,23,0.4);">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 60px;">
+                <div class="tagline">XDR INFRASTRUCTURE</div>
+                <h2 style="font-size: 2.5rem;">Cross-Domain Analytics</h2>
+            </div>
+            
+            <div class="arch-wrap gs-up">
+                <div class="arch-grid-bg"></div>
+                <svg class="arch-viz" viewBox="0 0 850 550">
+                    <!-- Global Logic Lines -->
+                    <path d="M150,450 L425,320 M330,450 L425,320 M510,450 L425,320 M690,450 L425,320" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" fill="none"/>
+                    <path d="M425,200 L425,100" class="pulse-line" fill="none"/>
+                    
+                    <!-- Sources -->
+                    <rect x="80" y="450" width="140" height="60" class="svg-node" />
+                    <text x="150" y="485" class="svg-text-main">Endpoints</text>
+
+                    <rect x="260" y="450" width="140" height="60" class="svg-node" />
+                    <text x="330" y="485" class="svg-text-main">Email Gateways</text>
+
+                    <rect x="440" y="450" width="140" height="60" class="svg-node" />
+                    <text x="510" y="485" class="svg-text-main">Network Fabric</text>
+
+                    <rect x="620" y="450" width="140" height="60" class="svg-node" />
+                    <text x="690" y="485" class="svg-text-main">Cloud / SaaS</text>
+                    
+                    <!-- XDR Center -->
+                    <rect x="200" y="200" width="450" height="150" class="svg-node-prime" />
+                    <text x="425" y="240" class="svg-text-accent">XDR ANALYTICS ENGINE</text>
+                    <text x="285" y="295" class="svg-text-dim">Correlation Logic</text>
+                    <text x="425" y="295" class="svg-text-dim">Intel Enrichment</text>
+                    <text x="565" y="295" class="svg-text-dim">MITRE Mapping</text>
+
+                    <!-- Management -->
+                    <rect x="250" y="30" width="350" height="70" class="svg-node" stroke-dasharray="5,5"/>
+                    <text x="425" y="70" class="svg-text-main" style="fill: var(--brand-accent);">DXSO CENTRAL PORTAL</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Capabilities -->
+    <section class="section">
+        <div class="container">
+            <div style="margin-bottom: 60px;">
+                <div class="tagline">INTELLIGENCE MATRIX</div>
+                <h2 style="font-size: 2.5rem;">Advanced XDR Integration</h2>
+            </div>
+            
+            <div class="cap-grid">
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="target"></i></div>
+                    <h3>Advanced EDR</h3>
+                    <p>Continuous recording and analysis of system events to identify multi-stage attacks that evade standard perimeter scans.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="globe"></i></div>
+                    <h3>Unified XDR</h3>
+                    <p>Correlate disparate signals from Network and Cloud layers into a single high-fidelity incident for rapid triage.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="map"></i></div>
+                    <h3>MITRE Tracking</h3>
+                    <p>Automated tagging of alerts with specific ATT&CK techniques, explaining the "how" behind an adversarial campaign.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="brain-circuit"></i></div>
+                    <h3>Intel Enrichment</h3>
+                    <p>Real-time augmentation from proprietary global intelligence feeds to immediately flag nation-state actor movement.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="search"></i></div>
+                    <h3>Vulnerability Ops</h3>
+                    <p>Proactive weekly estate assessments that prioritize remediation based on actual exploitability within your sector.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="bot"></i></div>
+                    <h3>SOAR Integration</h3>
+                    <p>Leverage automated remediation playbooks to neutralize threats and isolate segments in minutes across the entire stack.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specs -->
+    <section id="specs" class="section" style="background: rgba(2,6,23,0.2);">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <div class="tagline">TECHNICAL STANDARDS</div>
+                <h2 style="font-size: 2.5rem;">Elite Tier Standards</h2>
+            </div>
+            
+            <div class="specs-wrap gs-up">
+                <div class="spec-item">
+                    <span class="spec-label">Environment Focus</span>
+                    <span class="spec-value">High-Growth Enterprises / Scalable Hybrid Infrastructure</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Operational Model</span>
+                    <span class="spec-value">Co-Managed Intelligence (Assisted Security Operations)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Data Retention</span>
+                    <span class="spec-value">90-Day High-Performance Searchable Forensic Log History</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Response SLA</span>
+                    <span class="spec-value">Priority Operational Response Protocol (&lt; 4 Hours)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Vulnerability Mgmt</span>
+                    <span class="spec-value">Weekly Full-Estate Scanning & Intelligence-Based Prioritization</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Compliance Layer</span>
+                    <span class="spec-value">Active ISO27001, SOC2 Type II, and PCI-DSS Mapping Readiness</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content gs-up">
+                <div class="tagline" style="justify-content: center;">Strategic Upgrade</div>
+                <h2>Activate Elite Intelligence</h2>
+                <p>Transition your defensive perimeter into an active intelligence asset. Our technical deployment team is standing by to bridge your visibility gaps across the entire stack.</p>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <a href="index.html#contact" class="btn">Talk to an Analyst <i data-lucide="mail"></i></a>
+                    <a href="index.html" class="btn btn-outline">Back to Platform</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (Standardized with Index) -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo">
+                        <img src="assets/images/lo.png" alt="DXSO Logo">
+                    </a>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 25px;">The definitive standard in global enterprise cybersecurity. Precision-engineered security for the modern frontier.</p>
+                </div>
+                <div class="footer-col">
+                    <h5>PLATFORM</h5>
+                    <a href="service-protect.html" class="footer-link">DXSO Protect</a>
+                    <a href="service-elite.html" class="footer-link">DXSO Elite</a>
+                    <a href="service-premium.html" class="footer-link">DXSO Premium</a>
+                </div>
+                <div class="footer-col">
+                    <h5>RESOURCES</h5>
+                    <a href="#" class="footer-link">Intelligence Feed</a>
+                    <a href="#" class="footer-link">Whitepapers</a>
+                    <a href="#" class="footer-link">Compliance</a>
+                </div>
+                <div class="footer-col">
+                    <h5>COMPANY</h5>
+                    <a href="#" class="footer-link">Mission</a>
+                    <a href="#" class="footer-link">Legal</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+            </div>
+            <div style="margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); text-align: center; font-size: 0.75rem; color: #475569;">
+                &copy; 2025 DXSO International. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.onload = () => {
+            lucide.createIcons();
+            initAnimations();
+        };
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('nav');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        function toggleMobileMenu() {
+            const links = document.querySelector('.nav-links');
+            if (window.innerWidth <= 768) {
+                links.classList.toggle('active');
+                links.style.right = links.classList.contains('active') ? '0' : '-100%';
+            }
+        }
+
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Staggered Fade-in
+            gsap.utils.toArray('.gs-fade').forEach((el, i) => {
+                gsap.from(el, { 
+                    opacity: 0, 
+                    y: 20, 
+                    duration: 1, 
+                    delay: i * 0.1,
+                    scrollTrigger: { trigger: el, start: "top 95%" } 
+                });
+            });
+
+            // Slide Up
+            gsap.utils.toArray('.gs-up').forEach(el => {
+                gsap.from(el, { 
+                    opacity: 0, 
+                    y: 40, 
+                    duration: 1.2, 
+                    ease: "power2.out",
+                    scrollTrigger: { trigger: el, start: "top 90%" } 
+                });
+            });
+
+            // Pulse Logic
+            gsap.to('.pulse-line', {
+                strokeDashoffset: -20,
+                duration: 2,
+                repeat: -1,
+                ease: "none"
+            });
+        }
+    </script>
+</body>
+</html>
