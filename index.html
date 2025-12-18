@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>DXSO | Enterprise Managed Security & Global SOC Operations</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/tl.png">
+    
+    <!-- Professional Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            --brand-accent: #10b981;
+            --brand-accent-glow: rgba(16, 185, 129, 0.2);
+            --brand-bg: #020617;
+            --brand-surface: rgba(15, 23, 42, 0.6);
+            --brand-surface-bright: rgba(30, 41, 59, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.06);
+            --glass-blur: blur(12px);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
+        
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        body {
+            background-color: var(--brand-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- ENHANCED GLASSY BACKGROUND --- */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .bg-glass-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
+        }
+
+        .glass-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--brand-accent-glow) 0%, transparent 70%);
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: floatOrb 25s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { width: 40vw; height: 40vw; top: -10%; left: -10%; }
+        .orb-2 { width: 50vw; height: 50vw; bottom: -20%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+        .orb-3 { width: 30vw; height: 30vw; top: 30%; right: 20%; animation-duration: 20s; animation-delay: -2s; opacity: 0.15; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10vw, 10vh) scale(1.1); }
+        }
+
+        /* --- UTILITIES --- */
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+        .section { padding: 120px 0; position: relative; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .text-accent { color: var(--brand-accent); }
+        h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.03em; color: white; }
+
+        .tagline {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--brand-accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+        }
+        .tagline::before { content: ""; width: 24px; height: 1px; background: var(--brand-accent); opacity: 0.4; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 36px;
+            background: var(--brand-accent);
+            color: var(--brand-bg);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -5px var(--brand-accent-glow);
+            background: #14cf91;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            color: white;
+            backdrop-filter: var(--glass-blur);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 28px 0; transition: 0.5s;
+        }
+        .navbar.scrolled {
+            background: rgba(2, 6, 23, 0.85);
+            padding: 18px 0;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo { 
+            display: flex;
+            align-items: center;
+            text-decoration: none; 
+            z-index: 1001;
+        }
+        .logo img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+        
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-link { 
+            font-size: 0.75rem; font-weight: 500; color: var(--text-muted); 
+            letter-spacing: 0.8px; transition: 0.3s; text-transform: uppercase;
+            text-decoration: none;
+        }
+        .nav-link:hover, .nav-link.active { color: white; }
+
+        .nav-dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 0;
+            background: #0f172a; border: 1px solid var(--border);
+            padding: 10px; min-width: 260px; display: none; flex-direction: column;
+            border-radius: 4px; margin-top: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+        }
+        .dropdown-menu a {
+            padding: 14px 20px; font-size: 0.7rem; color: var(--text-muted); border-radius: 2px;
+            font-family: 'JetBrains Mono'; text-transform: uppercase; text-decoration: none;
+        }
+        .dropdown-menu a:hover { color: white; background: rgba(255,255,255,0.03); }
+        .nav-dropdown:hover .dropdown-menu { display: flex; }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            text-align: center; padding-top: 100px;
+        }
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1.1; margin-bottom: 32px; max-width: 1200px; font-weight: 700; }
+        .hero p { font-size: clamp(1rem, 2vw, 1.1rem); color: var(--text-muted); max-width: 750px; margin: 0 auto 56px; font-weight: 300; }
+        .hero h1 span { color: var(--brand-accent); }
+
+        /* --- STATS STRIP --- */
+        .stats-strip {
+            overflow: hidden;
+            border-top: 1px solid var(--border); 
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.01);
+        }
+        .stats-track {
+            display: grid; 
+            grid-template-columns: repeat(6, 1fr);
+            width: 100%;
+        }
+        .stat-box { padding: 50px 15px; text-align: center; border-right: 1px solid var(--border); }
+        .stat-box:last-child { border-right: none; }
+        .stat-box h3 { font-size: clamp(1.8rem, 4vw, 2.8rem); color: white; margin-bottom: 8px; font-weight: 200; white-space: nowrap; }
+        .stat-box p { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--brand-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+        
+        /* Duplicated elements for marquee */
+        .m-dup { display: none; }
+
+        /* --- ABOUT & WHITEPAPER --- */
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .whitepaper-card {
+            margin-top: 100px;
+            background: var(--brand-surface);
+            border: 1px solid var(--border);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            border-radius: 4px;
+            backdrop-filter: var(--glass-blur);
+        }
+        .wp-icon { 
+            width: 64px; 
+            height: 64px; 
+            background: var(--brand-accent-glow); 
+            border-radius: 4px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--brand-accent); 
+            flex-shrink: 0; 
+        }
+
+        /* --- SERVICE CARDS --- */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 60px; }
+        .card {
+            background: var(--brand-surface); 
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 50px 35px; border-radius: 4px; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: var(--glass-blur);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .card:hover { border-color: var(--brand-accent); background: var(--brand-surface-bright); transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.1); }
+        .card-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.03); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--brand-accent); margin-bottom: 30px; border: 1px solid var(--border); }
+        .card h3 { margin-bottom: 8px; font-size: 1.5rem; }
+        .card .card-subtitle { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--brand-accent); margin-bottom: 16px; font-weight: 600; text-transform: uppercase; }
+        .card .card-description { color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem; line-height: 1.6; min-height: 4.8em; }
+        .card-list { list-style: none; margin-bottom: auto; padding-bottom: 30px; }
+        .card-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.8rem; color: var(--text-main); margin-bottom: 12px; line-height: 1.4; }
+        .card-meta { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+        .card-meta p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+        .card-meta p span { color: white; font-weight: 600; }
+        
+        .card-link { 
+            margin-top: 24px; color: var(--brand-accent); font-family: 'JetBrains Mono'; 
+            font-size: 0.75rem; font-weight: 700; text-decoration: none; 
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; 
+        }
+        .card-link:hover { gap: 12px; }
+        
+        .card-link::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--brand-accent);
+            color: var(--brand-bg);
+            font-family: 'JetBrains Mono';
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 2px;
+            letter-spacing: 1.5px;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* --- COMPARE TABLE --- */
+        .table-wrap { margin-top: 80px; border: 1px solid var(--border); border-radius: 4px; overflow-x: auto; background: var(--brand-surface); backdrop-filter: var(--glass-blur); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { padding: 22px 25px; text-align: left; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+        th:last-child, td:last-child { border-right: none; }
+        th { background: rgba(255,255,255,0.02); color: var(--text-muted); font-family: 'JetBrains Mono'; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; }
+        td:first-child { color: var(--text-muted); font-weight: 400; font-family: 'Inter'; font-size: 0.85rem; width: 260px; }
+        .check { color: var(--brand-accent); font-weight: bold; }
+        .dash { color: #ef4444; }
+        .table-value { color: white; font-size: 0.8rem; font-weight: 500; }
+
+        /* --- INDUSTRIES --- */
+        .ind-layout { display: grid; grid-template-columns: 320px 1fr; gap: 40px; margin-top: 60px; }
+        .ind-list { display: flex; flex-direction: column; gap: 10px; }
+        .ind-btn {
+            padding: 20px; background: var(--brand-surface); border: 1px solid var(--border);
+            border-radius: 4px; text-align: left; transition: 0.3s; color: var(--text-muted);
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 15px;
+            white-space: nowrap;
+        }
+        .ind-btn.active { border-color: var(--brand-accent); color: white; background: var(--brand-surface-bright); }
+        .ind-btn i { font-size: 1.2rem; font-style: normal; width: 24px; text-align: center; }
+        .ind-panel { background: var(--brand-surface); border: 1px solid var(--border); border-radius: 4px; padding: 60px; backdrop-filter: var(--glass-blur); overflow: hidden; }
+
+        /* --- PROCESS & FLOW --- */
+        .process-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-top: 80px; }
+        .step-num { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--brand-accent); display: block; margin-bottom: 20px; font-weight: 700; opacity: 0.8; }
+        .step h4 { margin-bottom: 12px; font-size: 1.1rem; }
+        .step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
+
+        /* --- ENHANCED FLOW --- */
+        .flow-wrapper { margin-top: 80px; padding: 60px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); border-radius: 8px; position: relative; overflow: hidden; }
+        .flow-grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 30px 30px; opacity: 0.2; pointer-events: none; }
+        
+        .flow-viz { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; gap: 20px; }
+        .viz-node { flex: 1; text-align: center; position: relative; }
+        .viz-circle { width: 80px; height: 80px; background: #0f172a; border: 1px solid var(--brand-accent); border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: var(--brand-accent); box-shadow: 0 0 20px var(--brand-accent-glow); position: relative; transition: 0.3s; }
+        .viz-node:hover .viz-circle { transform: scale(1.1); background: var(--brand-accent-glow); }
+        .viz-line { position: absolute; top: 40px; left: 50%; width: 100%; height: 1px; background: linear-gradient(90deg, var(--brand-accent), transparent); opacity: 0.3; z-index: -1; }
+        .viz-node:last-child .viz-line { display: none; }
+        .viz-label { font-family: 'JetBrains Mono'; font-size: 0.7rem; font-weight: 700; color: white; letter-spacing: 2px; text-transform: uppercase; }
+        .viz-status { font-size: 0.6rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* --- COMPATIBILITY SECTION --- */
+        .comp-title { text-align: center; margin-top: 80px; margin-bottom: 40px; }
+        .comp-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+        .comp-item { background: var(--brand-surface); border: 1px solid var(--border); padding: 25px 10px; border-radius: 4px; text-align: center; transition: 0.3s; }
+        .comp-item:hover { border-color: var(--brand-accent); background: var(--brand-surface-bright); transform: translateY(-5px); }
+        .comp-item i { color: var(--brand-accent); margin-bottom: 12px; opacity: 0.8; display: block; }
+        .comp-item span { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: white; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- NEW NEURAL COMMAND SECTION --- */
+        .neural-card { background: var(--brand-surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 1fr 1.2fr; min-height: 500px; backdrop-filter: var(--glass-blur); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5); }
+        .neural-info { padding: 60px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border); }
+        .neural-viz { background: #01040a; padding: 40px; position: relative; display: flex; flex-direction: column; min-width: 0; }
+        
+        .radar-box { position: relative; width: 100%; height: 260px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .radar-circle { position: absolute; border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 50%; }
+        .radar-sweep { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: bottom left; background: conic-gradient(from 0deg, transparent, var(--brand-accent-glow), transparent 50%); animation: rotate 4s linear infinite; }
+        
+        .radar-blip {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            transform: scale(0);
+        }
+        .blip-red { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
+        .blip-green { background: var(--brand-accent); box-shadow: 0 0 15px var(--brand-accent); }
+
+        .active-logic { 
+            flex: 1; 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--border); 
+            border-radius: 4px; 
+            padding: 20px; 
+            font-family: 'JetBrains Mono'; 
+            font-size: 0.75rem; 
+            color: var(--brand-accent); 
+            overflow: hidden;
+            position: relative;
+        }
+        .active-logic::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--brand-accent);
+            opacity: 0.2;
+            animation: scanline 3s linear infinite;
+        }
+        .logic-line { margin-bottom: 6px; opacity: 0.7; display: flex; gap: 15px; white-space: nowrap; }
+        .logic-ts { color: #334155; }
+        
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* --- CERTIFICATIONS MARQUEE --- */
+        .cert-marquee { overflow: hidden; padding: 60px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); }
+        .cert-track { display: flex; width: max-content; animation: scroll 30s linear infinite; align-items: center; }
+        .cert-item { padding: 0 60px; display: flex; align-items: center; gap: 15px; white-space: nowrap; }
+        .cert-item i { color: var(--brand-accent); font-size: 1.4rem; }
+        .cert-item span { font-family: 'JetBrains Mono'; color: white; font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; }
+
+        /* --- PHILOSOPHY --- */
+        .philosophy-section { padding: 120px 0; text-align: center; max-width: 900px; margin: 0 auto; }
+        .philosophy-section h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 30px; font-weight: 200; letter-spacing: -2px; }
+        .philosophy-section p { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-muted); line-height: 1.8; font-weight: 300; }
+
+        /* --- LIVE INTEL FEED (Effect) --- */
+        .intel-container { background: #01040a; border: 1px solid var(--border); border-radius: 4px; padding: 30px; height: 400px; overflow: hidden; position: relative; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
+        .intel-container::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; background: linear-gradient(to top, #01040a, transparent); }
+        .log-entry { margin-bottom: 10px; color: var(--text-muted); opacity: 0; transform: translateY(10px); }
+        .log-ts { color: #334155; margin-right: 15px; }
+        .log-msg.alert { color: var(--brand-accent); font-weight: 700; }
+
+        /* --- MARQUEE (Animation) --- */
+        .marquee { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 40px 0; background: rgba(255,255,255,0.01); }
+        .marquee-inner { display: flex; width: max-content; animation: scroll 40s linear infinite; }
+        .m-item { padding: 0 60px; font-family: 'JetBrains Mono'; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* --- TESTIMONIALS --- */
+        .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 60px; }
+        .test-card { background: var(--brand-surface); border: 1px solid var(--border); padding: 50px; border-radius: 4px; backdrop-filter: var(--glass-blur); transition: 0.3s; }
+        .test-card:hover { border-color: rgba(255,255,255,0.2); background: var(--brand-surface-bright); }
+        .test-card p { font-style: italic; color: #e2e8f0; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.8; font-weight: 300; }
+        .test-meta h5 { color: white; font-size: 1rem; margin-bottom: 4px; }
+        .test-meta span { color: var(--brand-accent); font-family: 'JetBrains Mono'; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+
+        /* --- FAQ (Transitions) --- */
+        .faq-wrap { max-width: 800px; margin: 60px auto 0; }
+        .faq-item { border: 1px solid var(--border); margin-bottom: 12px; border-radius: 4px; background: var(--brand-surface); overflow: hidden; }
+        .faq-trigger { width: 100%; padding: 25px; display: flex; justify-content: space-between; align-items: center; background: none; border: none; color: white; font-size: 1rem; font-weight: 600; text-align: left; cursor: pointer; }
+        .faq-content { max-height: 0; padding: 0 25px; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; opacity: 0; }
+        .faq-item.active .faq-content { max-height: 300px; padding-bottom: 25px; opacity: 1; }
+        .faq-icon { transition: 0.3s; color: var(--brand-accent); flex-shrink: 0; }
+        .faq-item.active .faq-icon { transform: rotate(45deg); }
+
+        /* --- CONTACT --- */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .form-wrap { background: rgba(255,255,255,0.01); border: 1px solid var(--border); padding: 50px; border-radius: 4px; backdrop-filter: var(--glass-blur); }
+        .form-input { width: 100%; padding: 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 4px; color: white; margin-bottom: 20px; outline: none; font-family: 'Inter'; transition: 0.3s; }
+        .form-input:focus { border-color: var(--brand-accent); background: rgba(255,255,255,0.05); }
+
+        /* --- FOOTER --- */
+        footer { padding: 100px 0 50px; border-top: 1px solid var(--border); background: #010409; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; }
+        .footer-col h5 { margin-bottom: 24px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--brand-accent); font-weight: 700; }
+        .footer-link { display: block; margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted); transition: 0.3s; text-decoration: none; }
+        .footer-link:hover { color: white; transform: translateX(5px); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 1200px) {
+            .stats-track { grid-template-columns: repeat(3, 1fr); }
+            .stat-box:nth-child(3), .stat-box:nth-child(6) { border-right: none; }
+            .stat-box { border-bottom: 1px solid var(--border); }
+            .stat-box:nth-child(4), .stat-box:nth-child(5), .stat-box:nth-child(6) { border-bottom: none; }
+            .comp-grid { grid-template-columns: repeat(3, 1fr); }
+            .neural-card { grid-template-columns: 1fr; }
+            .neural-info { border-right: none; border-bottom: 1px solid var(--border); }
+        }
+
+        @media (max-width: 991px) {
+            .about-grid { grid-template-columns: 1fr; gap: 40px; }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .ind-layout { grid-template-columns: 1fr; }
+            .ind-list { flex-direction: row; flex-wrap: wrap; }
+            .ind-btn { flex: 1; min-width: 240px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-col:first-child { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .section { padding: 80px 0; }
+            .navbar { padding: 20px 0; }
+            #m-toggle { display: block !important; }
+            
+            .about-grid .gs-right { display: none; }
+
+            .stats-track { 
+                display: flex; 
+                grid-template-columns: none;
+                width: max-content; 
+                animation: scroll 30s linear infinite; 
+                align-items: center;
+            }
+            .stat-box { 
+                border-right: 1px solid var(--border); 
+                border-bottom: none !important; 
+                width: 250px;
+                flex-shrink: 0;
+            }
+            .m-dup { display: block; }
+
+            .ind-list {
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 15px;
+                gap: 12px;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                mask-image: linear-gradient(to right, black 90%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            }
+            .ind-list::-webkit-scrollbar { display: none; }
+            
+            .ind-btn {
+                flex: 0 0 auto !important;
+                width: auto !important;
+                min-width: 200px;
+            }
+
+            .test-grid {
+                display: flex !important;
+                grid-template-columns: none;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                gap: 20px;
+                scrollbar-width: none;
+                padding-bottom: 20px;
+            }
+            .test-grid::-webkit-scrollbar { display: none; }
+            .test-card {
+                flex: 0 0 100%;
+                min-width: 100%;
+                scroll-snap-align: start;
+                padding: 40px 25px;
+            }
+
+            .comp-grid {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+                padding-bottom: 15px;
+                gap: 15px;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                mask-image: linear-gradient(to right, black 90%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            }
+            .comp-grid::-webkit-scrollbar { display: none; }
+            .comp-item {
+                flex: 0 0 180px !important;
+                scroll-snap-align: start;
+            }
+
+            .nav-links { 
+                position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
+                background: #020617; flex-direction: column; justify-content: center;
+                gap: 40px; transition: 0.4s ease-in-out;
+            }
+            .nav-links.active { right: 0; }
+            .nav-dropdown:hover .dropdown-menu { position: static; display: flex; box-shadow: none; border: none; padding-left: 0; align-items: center; }
+
+            .process-row { grid-template-columns: repeat(2, 1fr); }
+            .contact-grid { grid-template-columns: 1fr; }
+            .whitepaper-card { flex-direction: column; text-align: center; }
+            .flow-viz { flex-direction: column; gap: 40px; }
+            .viz-line { display: none; }
+            
+            .flow-wrapper { display: none; }
+            
+            .ind-panel { padding: 30px; }
+            .ind-panel > div { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                gap: 30px; 
+            }
+            .ind-panel img { height: 240px; order: 2; }
+            .ind-panel #ind-content { order: 1; }
+
+            .neural-info { padding: 30px; }
+        }
+
+        @media (max-width: 480px) {
+            .grid-3, .process-row { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.2rem; }
+            .philosophy-section h2 { font-size: 1.8rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-col:first-child { grid-column: span 1; }
+            .hero-btns { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Premium Dynamic Background -->
+    <div class="bg-glass-layer">
+        <div class="glass-orb orb-1"></div>
+        <div class="glass-orb orb-2"></div>
+        <div class="glass-orb orb-3"></div>
+    </div>
+    <div class="bg-mesh"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="nav">
+        <div class="container nav-flex">
+            <a href="#" class="logo">
+                <img src="assets/images/lo.png" alt="DXSO Logo">
+            </a>
+            <div class="nav-links">
+                <a href="#about" class="nav-link" onclick="toggleMobileMenu()">Intelligence</a>
+                <div class="nav-dropdown">
+                    <a href="#services" class="nav-link">Managed Services ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="service-protect1.html">Managed EDR (Protect)</a>
+                        <a href="service-elite1.html">Managed XDR (Elite)</a>
+                        <a href="service-premium1.html">Managed SOC (Premium)</a>
+                    </div>
+                </div>
+                <a href="#industries" class="nav-link" onclick="toggleMobileMenu()">Industries</a>
+                <a href="#process" class="nav-link" onclick="toggleMobileMenu()">Operations</a>
+                <a href="#contact" class="btn btn-outline" onclick="toggleMobileMenu()">Portal Login</a>
+            </div>
+            <div id="m-toggle" style="display:none; color:white; font-size:1.8rem; cursor:pointer; z-index:1001;" onclick="toggleMobileMenu()">☰</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="tagline gs-fade">ENTERPRISE DEFENSE</div>
+            <h1 class="gs-fade">Adopt, Scale, and Operate <span>Cybersecurity</span> with Precision.</h1>
+            <p class="gs-fade">From foundational endpoint protection to full-scale managed security operations. We consolidate your fragmented security stack with military-grade intelligence and sub-15 minute response SLAs.</p>
+            <div class="hero-btns gs-fade">
+                <a href="#contact" class="btn">Deploy Defense <i data-lucide="shield-check"></i></a>
+                <a href="#services" class="btn btn-outline">View Platform Tiers</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <div class="stats-strip">
+        <div class="stats-track">
+            <!-- Set 1 -->
+            <div class="stat-box">
+                <h3 class="count" data-val="500" data-suffix="T">0T</h3>
+                <p>DATA ANALYZED</p>
+            </div>
+            <div class="stat-box">
+                <h3 class="count" data-val="200" data-suffix="ms">0ms</h3>
+                <p>RESPONSE TIME</p>
+            </div>
+            <div class="stat-box">
+                <h3 class="count" data-val="100" data-suffix="%">0%</h3>
+                <p>UPTIME GUARANTEE</p>
+            </div>
+            <div class="stat-box">
+                <h3>24/7</h3>
+                <p>SOC MONITORING</p>
+            </div>
+            <div class="stat-box">
+                <h3 class="count" data-val="100" data-suffix="%">0%</h3>
+                <p>THREAT VISIBILITY</p>
+            </div>
+            <div class="stat-box">
+                <h3>ZERO</h3>
+                <p>TRUST ARCHITECTURE</p>
+            </div>
+            <!-- Set 2 -->
+            <div class="stat-box m-dup">
+                <h3 class="count" data-val="500" data-suffix="T">0T</h3>
+                <p>DATA ANALYZED</p>
+            </div>
+            <div class="stat-box m-dup">
+                <h3 class="count" data-val="200" data-suffix="ms">0ms</h3>
+                <p>RESPONSE TIME</p>
+            </div>
+            <div class="stat-box m-dup">
+                <h3 class="count" data-val="100" data-suffix="%">0%</h3>
+                <p>UPTIME GUARANTEE</p>
+            </div>
+            <div class="stat-box m-dup">
+                <h3>24/7</h3>
+                <p>SOC MONITORING</p>
+            </div>
+            <div class="stat-box m-dup">
+                <h3 class="count" data-val="100" data-suffix="%">0%</h3>
+                <p>THREAT VISIBILITY</p>
+            </div>
+            <div class="stat-box m-dup">
+                <h3>ZERO</h3>
+                <p>TRUST ARCHITECTURE</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="about-grid">
+                <div class="gs-left">
+                    <div class="tagline">ABOUT DXSO</div>
+                    <h2 style="font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.2; margin-bottom: 30px;">Your Tactical <br>Defense Partner</h2>
+                    <p style="color: white; font-size: 1.05rem; margin-bottom: 15px; font-weight:500;">We are not just a vendor; we are your tactical defense partner.</p>
+                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 15px; font-weight:300;">In an era where digital threats evolve daily, DXSO stands as the barrier between your data and compromise.</p>
+                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; font-weight:300;">Founded by military-grade intelligence experts, we translate high-level security protocols into scalable business solutions. Whether you are an SMB needing endpoint protection or an Enterprise requiring full-scale SOC operations, <strong>we scale with you.</strong></p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+                        <div style="border-left: 1px solid var(--brand-accent); padding-left: 20px;">
+                            <h4 style="margin-bottom: 6px; font-size: 1rem;">Military DNA</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Protocols built on elite signals intelligence frameworks.</p>
+                        </div>
+                        <div style="border-left: 1px solid var(--brand-accent); padding-left: 20px;">
+                            <h4 style="margin-bottom: 6px; font-size: 1rem;">Elastic Scale</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Infrastructure that expands from SMB to global Fortune 500.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="gs-right">
+                    <div class="intel-container" id="intel-feed"></div>
+                </div>
+            </div>
+
+            <!-- Whitepaper Interactive Card -->
+            <div class="whitepaper-card gs-up">
+                <div class="wp-icon"><i data-lucide="file-text"></i></div>
+                <div style="flex: 1;">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">2025 State of Global Cybersecurity</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; font-weight:300;">Strategic report on ransomware evolution, nation-state actor profiles, and the impact of generative AI on social engineering.</p>
+                </div>
+                <a href="#" class="btn btn-outline" style="white-space: nowrap;">Download PDF</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="section" style="background: rgba(2,6,23,0.4);">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 80px;">
+                <div class="tagline">MANAGED SERVICES</div>
+                <h2 style="font-size: 2.5rem;">Defensive Matrix Tiers</h2>
+            </div>
+            
+            <div class="grid-3">
+                <!-- Protect -->
+                <div class="card gs-up">
+                    <div class="card-tag">ESSENTIAL</div>
+                    <div class="card-icon"><i data-lucide="shield"></i></div>
+                    <h3>DXSO Protect</h3>
+                    <div class="card-subtitle">Basic Endpoint Security</div>
+                    <p class="card-description">Foundational endpoint protection against malware, ransomware, and exploit-based threats with centralized cloud management.</p>
+                    <ul class="card-list">
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Antivirus & EPP</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> EDR with behavioral detection</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Exploit prevention</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Device & application control</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Secure web & URL filtering</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Centralized cloud console</li>
+                    </ul>
+                    <div class="card-meta">
+                        <p>Best suited for: <span>SMBs</span></p>
+                        <p>Model: <span>Self-managed</span></p>
+                    </div>
+                    <a href="service-protect1.html" class="card-link">Explore Protect <i data-lucide="chevron-right" size="14"></i></a>
+                </div>
+                
+                <!-- Elite -->
+                <div class="card gs-up">
+                    <div class="card-tag">ADVANCED</div>
+                    <div class="card-icon"><i data-lucide="zap"></i></div>
+                    <h3>DXSO Elite</h3>
+                    <div class="card-subtitle">Intermediate Security with XDR</div>
+                    <p class="card-description">Extends endpoint security with advanced detection, correlation, and visibility across multiple security layers.</p>
+                    <ul class="card-list">
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Advanced EDR</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> MITRE ATT&CK detection</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> XDR (Endpoint, Network, Cloud)</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Threat intel enrichment</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Vulnerability assessment</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Automated & guided response</li>
+                    </ul>
+                    <div class="card-meta">
+                        <p>Best suited for: <span>Mid-market</span></p>
+                        <p>Model: <span>Assisted security ops</span></p>
+                    </div>
+                    <a href="service-elite1.html" class="card-link">Explore Elite <i data-lucide="chevron-right" size="14"></i></a>
+                </div>
+                
+                <!-- Premium -->
+                <div class="card gs-up">
+                    <div class="card-tag">ULTIMATE</div>
+                    <div class="card-icon"><i data-lucide="activity"></i></div>
+                    <h3>DXSO Premium</h3>
+                    <div class="card-subtitle">Advanced SOC, SIEM & SOAR</div>
+                    <p class="card-description">Full-scale managed security operations delivered by DXSO SOC experts for mission-critical defense.</p>
+                    <ul class="card-list">
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Unified XDR Platform</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Full SIEM & log correlation</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> SOAR & automated playbooks</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Network Detection & Response</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> Advanced threat hunting</li>
+                        <li><i data-lucide="check" size="14" class="text-accent"></i> DXSO SOC (8×5 + on-demand)</li>
+                    </ul>
+                    <div class="card-meta">
+                        <p>Best suited for: <span>Enterprise & Gov</span></p>
+                        <p>Model: <span>Fully managed MSSP</span></p>
+                    </div>
+                    <a href="service-premium1.html" class="card-link">Explore Premium <i data-lucide="chevron-right" size="14"></i></a>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div style="text-align: center; margin-top: 100px; margin-bottom: 40px;">
+                <h3 class="gs-up" style="font-size: 1.8rem; font-weight:300;">Operational Comparison Matrix</h3>
+            </div>
+            <div class="table-wrap gs-up">
+                <table>
+                    <thead>
+                        <tr><th>Feature</th><th>Protect</th><th>Elite</th><th>Premium</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Endpoint Protection</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td></tr>
+                        <tr><td>XDR</td><td class="dash">❌</td><td class="check">✅</td><td class="check">✅</td></tr>
+                        <tr><td>SIEM</td><td class="dash">❌</td><td class="table-value">Limited</td><td class="table-value">Full</td></tr>
+                        <tr><td>SOAR</td><td class="dash">❌</td><td class="table-value">Limited</td><td class="table-value">Full</td></tr>
+                        <tr><td>Threat Hunting</td><td class="dash">❌</td><td class="table-value">Guided</td><td class="table-value">Advanced</td></tr>
+                        <tr><td>SOC Services</td><td class="dash">❌</td><td class="dash">❌</td><td class="check">✅</td></tr>
+                        <tr><td>24/7 Monitoring</td><td class="table-value">Automated</td><td class="table-value">Analyst Reviewed</td><td class="table-value">Human-Led Real-Time</td></tr>
+                        <tr><td>Response SLA</td><td class="table-value">Standard</td><td class="table-value">Priority (&lt; 4h)</td><td class="table-value">Critical (&lt; 15m)</td></tr>
+                        <tr><td>Log Retention</td><td class="table-value">30 Days</td><td class="table-value">90 Days</td><td class="table-value">1 Year +</td></tr>
+                        <tr><td>Vulnerability Mgmt</td><td class="dash">❌</td><td class="table-value">Weekly Scan</td><td class="table-value">Continuous</td></tr>
+                        <tr><td>Compliance Reporting</td><td class="table-value">Basic</td><td class="table-value">Standard</td><td class="table-value">Full Suite</td></tr>
+                        <tr><td>Account Manager</td><td class="dash">❌</td><td class="table-value">Shared</td><td class="table-value">Dedicated</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industries Section -->
+    <section id="industries" class="section">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 60px;">
+                <div class="tagline">INDUSTRIES WE SERVE</div>
+                <h2 style="font-size: 2.5rem;">Sectors of Expertise</h2>
+            </div>
+            
+            <div class="ind-layout">
+                <div class="ind-list gs-left">
+                    <button class="ind-btn active" onclick="showInd('finance', this)"><i>🏦</i> Finance & Banking</button>
+                    <button class="ind-btn" onclick="showInd('healthcare', this)"><i>🏥</i> Healthcare</button>
+                    <button class="ind-btn" onclick="showInd('manufacturing', this)"><i>🏭</i> Manufacturing</button>
+                    <button class="ind-btn" onclick="showInd('retail', this)"><i>🛒</i> Retail & E-comm</button>
+                    <button class="ind-btn" onclick="showInd('government', this)"><i>🏛️</i> Government</button>
+                    <button class="ind-btn" onclick="showInd('legal', this)"><i>⚖️</i> Legal</button>
+                </div>
+                
+                <div class="ind-panel gs-right" id="ind-panel">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items:center;">
+                        <div id="ind-content">
+                            <h3 id="ind-title" style="font-size: 1.8rem; margin-bottom: 20px; font-weight:300;">Finance & Banking</h3>
+                            <p id="ind-text" style="color:var(--text-muted); font-size: 1rem; line-height: 1.7; font-weight:300;">We secure high-frequency trading platforms and international banking backbones from nation-state persistent threats and transactional fraud.</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 4px; height: 300px; overflow:hidden;">
+                            <img id="ind-img" src="https://images.unsplash.com/photo-1611974765270-ca12586343bb?q=80&w=1000&auto=format&fit=crop" style="width:100%; height:100%; object-fit:cover; opacity:0.3; filter:grayscale(100%);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="section bg-surface">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 80px;">
+                <div class="tagline">METHODOLOGY</div>
+                <h2 style="font-size: 2.5rem;">Operational Deployment Flow</h2>
+            </div>
+            
+            <div class="process-row">
+                <div class="step gs-up">
+                    <span class="step-num">01 / AUDIT</span>
+                    <h4>Surface Discovery</h4>
+                    <p>Agentless mapping of every IP, identity, and shadow-IT cloud asset in your environment.</p>
+                </div>
+                <div class="step gs-up">
+                    <span class="step-num">02 / HARDEN</span>
+                    <h4>Zero-Trust Baseline</h4>
+                    <p>Implementation of conditional access and micro-segmentation policies across the stack.</p>
+                </div>
+                <div class="step gs-up">
+                    <span class="step-num">03 / MONITOR</span>
+                    <h4>AI Integration</h4>
+                    <p>Custom training of behavior models to distinguish proprietary workflows from anomalies.</p>
+                </div>
+                <div class="step gs-up">
+                    <span class="step-num">04 / DEFEND</span>
+                    <h4>SOC Handover</h4>
+                    <p>24/7 active vigilant oversight with sub-15 minute isolation of compromise.</p>
+                </div>
+            </div>
+
+            <!-- Flowmap Visualization -->
+            <div class="flow-wrapper gs-up">
+                <div class="flow-grid-bg"></div>
+                <div class="flow-viz">
+                    <div class="viz-node">
+                        <div class="viz-circle"><i data-lucide="database"></i></div>
+                        <div class="viz-label">Telemetry Ingest</div>
+                        <div class="viz-status mono">NODE_HK_04 ACTIVE</div>
+                        <div class="viz-line"></div>
+                    </div>
+                    <div class="viz-node">
+                        <div class="viz-circle"><i data-lucide="brain-circuit"></i></div>
+                        <div class="viz-label">Logic Processing</div>
+                        <div class="viz-status mono">98.2% MODEL_CONF</div>
+                        <div class="viz-line"></div>
+                    </div>
+                    <div class="viz-node">
+                        <div class="viz-circle"><i data-lucide="shield-alert"></i></div>
+                        <div class="viz-label">Pattern Isolation</div>
+                        <div class="viz-status mono">0ms LATENCY_HIT</div>
+                        <div class="viz-line"></div>
+                    </div>
+                    <div class="viz-node">
+                        <div class="viz-circle"><i data-lucide="target"></i></div>
+                        <div class="viz-label">Threat Neutralized</div>
+                        <div class="viz-status mono">PURGE_SEQ COMPLETE</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compatibility Grid -->
+            <div class="comp-title gs-fade">
+                <div class="tagline">FEATURED COMPATIBILITY</div>
+            </div>
+            <div class="comp-grid">
+                <div class="comp-item gs-up">
+                    <i data-lucide="monitor"></i>
+                    <span>Endpoints</span>
+                </div>
+                <div class="comp-item gs-up">
+                    <i data-lucide="smartphone"></i>
+                    <span>Mobile</span>
+                </div>
+                <div class="comp-item gs-up">
+                    <i data-lucide="cloud"></i>
+                    <span>Microsoft 365</span>
+                </div>
+                <div class="comp-item gs-up">
+                    <i data-lucide="network"></i>
+                    <span>Network</span>
+                </div>
+                <div class="comp-item gs-up">
+                    <i data-lucide="server"></i>
+                    <span>Cloud</span>
+                </div>
+                <div class="comp-item gs-up">
+                    <i data-lucide="cpu"></i>
+                    <span>OT / IoT</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Proprietary Tech Section -->
+    <section class="section">
+        <div class="container">
+            <div class="neural-card gs-up">
+                <div class="neural-info">
+                    <div class="tagline">PROPRIETARY ENGINE</div>
+                    <h2 style="font-size: 2.2rem; margin-bottom: 20px;">AI-Driven Threat Hunting</h2>
+                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; font-weight:300;">Traditional perimeter defenses are reactive. DXSO utilizes proprietary behavioral algorithms to detect adversarial movement before it reaches the core.</p>
+                    <div style="margin-bottom: 40px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                            <div style="width: 8px; height: 8px; background: var(--brand-accent); border-radius: 50%;"></div>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Zero-Day Exploit Prediction</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                            <div style="width: 8px; height: 8px; background: var(--brand-accent); border-radius: 50%;"></div>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Automatic Lateral Move Isolation</span>
+                        </div>
+                    </div>
+                    <a href="#contact" class="btn" style="align-self: flex-start;">Request Demo</a>
+                </div>
+                <div class="neural-viz">
+                    <div class="radar-box">
+                        <div class="radar-circle" style="width: 60px; height: 60px;"></div>
+                        <div class="radar-circle" style="width: 140px; height: 140px;"></div>
+                        <div class="radar-circle" style="width: 220px; height: 220px;"></div>
+                        <div class="radar-sweep"></div>
+                        <!-- Strategic Blips -->
+                        <div class="radar-blip blip-red" style="top: 30%; left: 40%;"></div>
+                        <div class="radar-blip blip-green" style="top: 60%; left: 70%;"></div>
+                    </div>
+                    <div class="active-logic">
+                        <div id="neural-logs">
+                            <!-- Animated by JS -->
+                        </div>
+                        <div style="width: 8px; height: 12px; background: var(--brand-accent); margin-top: 10px; animation: blink 1s infinite;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications -->
+    <div class="container" style="text-align:center; margin-top: 120px; margin-bottom: 40px;">
+        <div class="tagline">CERTIFICATIONS</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Compliance & Governance</h2>
+        <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto; font-weight: 300;">DXSO takes customer's data security seriously. To that end, we are certified with ISO27001 and other industry standard certifications.</p>
+    </div>
+
+    <div class="cert-marquee">
+        <div class="cert-track">
+            <div class="cert-item"><i data-lucide="award"></i> <span>ISO27001 CERTIFIED</span></div>
+            <div class="cert-item"><i data-lucide="shield-check"></i> <span>SOC2 TYPE II</span></div>
+            <div class="cert-item"><i data-lucide="check-circle"></i> <span>GDPR COMPLIANT</span></div>
+            <div class="cert-item"><i data-lucide="lock"></i> <span>PCI DSS READY</span></div>
+            <div class="cert-item"><i data-lucide="globe"></i> <span>HIPAA COMPLIANT</span></div>
+            <!-- Loop -->
+            <div class="cert-item"><i data-lucide="award"></i> <span>ISO27001 CERTIFIED</span></div>
+            <div class="cert-item"><i data-lucide="shield-check"></i> <span>SOC2 TYPE II</span></div>
+            <div class="cert-item"><i data-lucide="check-circle"></i> <span>GDPR COMPLIANT</span></div>
+            <div class="cert-item"><i data-lucide="lock"></i> <span>PCI DSS READY</span></div>
+            <div class="cert-item"><i data-lucide="globe"></i> <span>HIPAA COMPLIANT</span></div>
+        </div>
+    </div>
+
+    <!-- Our Philosophy -->
+    <section id="philosophy" class="section">
+        <div class="container">
+            <div class="philosophy-section gs-up">
+                <div class="tagline">OUR PHILOSOPHY</div>
+                <h2>Ethics & Trust at the Core</h2>
+                <p>DXSO’s offerings carry its own philosophy. We strongly believe that cyber security is all about <strong>Ethics and Trust.</strong> When you work with us, you feel safe, secure and most importantly, trustworthy. We don't just protect data; we protect the integrity of your mission.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Header -->
+    <div class="container" style="text-align:center; margin-bottom: 40px;">
+        <div class="tagline">OUR PARTNERS</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Strategic Alliances</h2>
+        <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto; font-weight: 300;">We collaborate with industry-leading technology providers to deliver a seamless, integrated security ecosystem across your entire digital stack.</p>
+    </div>
+
+    <!-- Partners Marquee -->
+    <div class="marquee">
+        <div class="marquee-inner">
+            <div class="m-item">Microsoft Azure</div><div class="m-item">AWS Security</div><div class="m-item">Crowdstrike</div><div class="m-item">SentinelOne</div><div class="m-item">Splunk Ops</div><div class="m-item">Palo Alto</div>
+            <div class="m-item">Microsoft Azure</div><div class="m-item">AWS Security</div><div class="m-item">Crowdstrike</div><div class="m-item">SentinelOne</div><div class="m-item">Splunk Ops</div><div class="m-item">Palo Alto</div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="section" style="background: rgba(2,6,23,0.2);">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 60px;">
+                <div class="tagline">TESTIMONIALS</div>
+                <h2 style="font-size: 2.5rem;">What Our Clients Say</h2>
+            </div>
+            
+            <div class="test-grid" id="testimonial-slider">
+                <div class="test-card gs-up">
+                    <p>"DXSO has played a key role in our digital journey, providing much-needed expertise in scaling AI and ML solutions."</p>
+                    <div class="test-meta">
+                        <h5>Shubham Mehrish</h5>
+                        <span>CIO, FinCorp Global</span>
+                    </div>
+                </div>
+                <div class="test-card gs-up">
+                    <p>"We bet on DXSO to bring that fresh approach to our threat hunting, and it paid off immediately."</p>
+                    <div class="test-meta">
+                        <h5>Ram Madiraju</h5>
+                        <span>CISO, TechStream</span>
+                    </div>
+                </div>
+                <div class="test-card gs-up">
+                    <p>"The speed of deployment was incredible. Within 48 hours, we had full visibility across our infrastructure."</p>
+                    <div class="test-meta">
+                        <h5>Sarah Havala</h5>
+                        <span>VP Ops, HealthPlus</span>
+                    </div>
+                </div>
+                <div class="test-card gs-up">
+                    <p>"Their SOC team feels like an extension of our own. The reports are concise and actionable."</p>
+                    <div class="test-meta">
+                        <h5>David Chen</h5>
+                        <span>CTO, AeroDef</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 60px;">
+                <div class="tagline">FAQ</div>
+                <h2 style="font-size: 2.5rem;">Frequently Asked Questions</h2>
+            </div>
+            
+            <div class="faq-wrap gs-up">
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">How quickly can DXSO deploy? <i data-lucide="plus" class="faq-icon"></i></button>
+                    <div class="faq-content">Our rapid response framework allows for baseline monitoring in as little as 24-48 hours. Full enterprise deployment across global nodes typically completes within 10 business days.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">Do you support hybrid cloud environments? <i data-lucide="plus" class="faq-icon"></i></button>
+                    <div class="faq-content">Absolutely. DXSO is built for the modern enterprise, integrating seamlessly with AWS, Azure, GCP, and on-premises legacy infrastructure.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">Is the SOC 24/7? <i data-lucide="plus" class="faq-icon"></i></button>
+                    <div class="faq-content">Our automated monitoring is 24/7. Human-led SOC analysis and distinct response times depend on your tier (Elite vs. Premium).</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">What compliance standards do you help meet? <i data-lucide="plus" class="faq-icon"></i></button>
+                    <div class="faq-content">We help automate compliance reporting for ISO27001, SOC2, HIPAA, GDPR, and PCI-DSS through continuous monitoring and log retention policies.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="contact-grid">
+                <div>
+                    <h2 style="font-size: clamp(2.2rem, 5vw, 3.2rem); margin-bottom: 30px; line-height:1.1;">Secure Your <br>Future Today.</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem; font-weight:300;">Ready to consolidate your defense? Contact our mission-ready response team.</p>
+                    <div class="mono" style="font-size: 0.85rem; border-left: 1px solid var(--brand-accent); padding-left: 25px;">
+                        <p style="margin-bottom: 8px; color:white; font-weight:700;">UPLINK: ops@dxso.security</p>
+                        <p style="color: var(--text-muted);">REGION: GLOBAL SECURITY OPS</p>
+                    </div>
+                </div>
+                <div class="form-wrap gs-right">
+                    <form onsubmit="return false">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <input type="text" placeholder="Full Name" class="form-input">
+                            <input type="email" placeholder="Corporate Email" class="form-input">
+                        </div>
+                        <input type="text" placeholder="Organization" class="form-input">
+                        <textarea placeholder="Tell us about your infrastructure goals..." rows="4" class="form-input"></textarea>
+                        <button class="btn" style="width: 100%;">Establish Secure Uplink</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="#" class="logo">
+                        <img src="assets/images/lo.png" alt="DXSO Logo">
+                    </a>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 25px;">The definitive standard in global enterprise cybersecurity. Precision-engineered security.</p>
+                </div>
+                <div class="footer-col">
+                    <h5>PLATFORM</h5>
+                    <a href="#" class="footer-link">DXSO Protect</a>
+                    <a href="#" class="footer-link">DXSO Elite</a>
+                    <a href="#" class="footer-link">DXSO Premium</a>
+                </div>
+                <div class="footer-col">
+                    <h5>RESOURCES</h5>
+                    <a href="#" class="footer-link">Intelligence Feed</a>
+                    <a href="#" class="footer-link">Whitepapers</a>
+                    <a href="#" class="footer-link">Compliance</a>
+                </div>
+                <div class="footer-col">
+                    <h5>COMPANY</h5>
+                    <a href="#" class="footer-link">Mission</a>
+                    <a href="#" class="footer-link">Legal</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+            </div>
+            <div style="margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); text-align: center; font-size: 0.75rem; color: #475569;">
+                &copy; 2025 DXSO International. All rights reserved. 
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let isInitialized = false;
+
+        const logs = [
+            "admin@dxso-core:~$ init_threat_scan",
+            "CONNECTING TO GLOBAL NODE GRID...",
+            "NODE: HK-04 STATUS: VIGILANT",
+            "SCANNING ENDPOINTS... [14,202 DETECTED]",
+            "IDENTIFYING ANOMALIES... NONE FOUND",
+            "AWS-US-EAST-1: TELEMETRY INGESTED",
+            "BEHAVIORAL ENGINE: BASELINE STABLE",
+            ">> ALERT: LATERAL SCAN ATTEMPT BLOCKED",
+            "SOURCE IP: 184.22.XX.XX ISOLATED",
+            "DXSO-AI: THREAT NEUTRALIZED",
+            "UPDATING BLOCKLISTS... [DONE]",
+            "SYSTEM STATUS: OPTIMIZED"
+        ];
+
+        window.onload = () => {
+            if (isInitialized) return;
+            isInitialized = true;
+            
+            lucide.createIcons();
+            initIntel();
+            initAnimations();
+            initTestimonialSlider();
+            initNeuralCommand();
+        };
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('nav');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        function toggleMobileMenu() {
+            const links = document.querySelector('.nav-links');
+            if (window.innerWidth <= 768) {
+                links.classList.toggle('active');
+            }
+        }
+
+        function initIntel() {
+            const feed = document.getElementById('intel-feed');
+            if (!feed) return;
+
+            setInterval(() => {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const ts = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+                const msg = logs[Math.floor(Math.random() * logs.length)];
+                const isAlert = msg.includes('ALERT') || msg.includes('NEUTRALIZED');
+                entry.innerHTML = `<span class="log-ts">[${ts}]</span> <span class="log-msg ${isAlert ? 'alert' : ''}">${msg}</span>`;
+                feed.prepend(entry);
+                gsap.to(entry, { opacity: 1, y: 0, duration: 0.5 });
+                if (feed.children.length > 12) feed.removeChild(feed.lastChild);
+            }, 2500);
+        }
+
+        /* --- NEURAL COMMAND OPTIMIZED ANIMATION --- */
+        function initNeuralCommand() {
+            const container = document.getElementById('neural-logs');
+            if (!container) return;
+
+            // Blip ping logic
+            const pings = () => {
+                gsap.to('.radar-blip', {
+                    scale: 3,
+                    opacity: 0,
+                    duration: 1.5,
+                    stagger: 0.5,
+                    repeat: -1,
+                    ease: "power2.out"
+                });
+            };
+            pings();
+
+            // Scrolling terminal logic
+            let step = 0;
+            const neuralLogs = [
+                "[SEC_AUDIT] NODE_3 SCAN...",
+                "ANALYSIS: 99.4% MATCH",
+                "ALERT: VECTOR DETECTED",
+                "ISOLATING SUBNET_4A...",
+                "STATUS: THREAT PURGED",
+                "SYNCING THREAT INTEL...",
+                "GLOBAL FIREWALL UPDATED",
+                "RE-SCANNING PERIMETER..."
+            ];
+
+            setInterval(() => {
+                const line = document.createElement('div');
+                line.className = 'logic-line';
+                const ts = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+                const msg = neuralLogs[step % neuralLogs.length];
+                const isAlert = msg.includes('ALERT');
+                
+                line.innerHTML = `<span class="logic-ts">${ts}</span><span style="${isAlert ? 'color: #ef4444; font-weight: bold;' : ''}">${msg}</span>`;
+                container.appendChild(line);
+                
+                gsap.from(line, { opacity: 0, x: -10, duration: 0.3 });
+                
+                if (container.children.length > 6) {
+                    container.removeChild(container.firstChild);
+                }
+                step++;
+            }, 2000);
+        }
+
+        /* --- AUTO-SWIPE TESTIMONIALS LOGIC --- */
+        function initTestimonialSlider() {
+            const slider = document.getElementById('testimonial-slider');
+            if (!slider) return;
+
+            let currentIndex = 0;
+            const cards = slider.querySelectorAll('.test-card');
+
+            setInterval(() => {
+                if (window.innerWidth <= 768) {
+                    currentIndex++;
+                    if (currentIndex >= cards.length) currentIndex = 0;
+                    
+                    const sliderWidth = slider.offsetWidth;
+                    slider.scrollTo({
+                        left: currentIndex * sliderWidth,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 3000);
+        }
+
+        function showInd(key, btn) {
+            const indData = {
+                finance: { title: "Finance & Banking", text: "We secure high-frequency trading platforms and international banking backbones from nation-state threats and transactional fraud.", img: "https://images.unsplash.com/photo-1611974765270-ca12586343bb?q=80&w=1000&auto=format&fit=crop" },
+                healthcare: { title: "Healthcare", text: "Protecting sensitive patient data and R&D secrets across decentralized networks with zero-latency protection.", img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000&auto=format&fit=crop" },
+                manufacturing: { title: "Manufacturing", text: "Hardening SCADA and ICS environments by bridging the visibility gap between IT and legacy operational technology.", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop" },
+                retail: { title: "Retail & E-comm", text: "Defending large-scale point-of-sale systems and payment gateways from skimming, botnets, and fraud.", img: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop" },
+                government: { title: "Government", text: "Enterprise-grade defense for public sector agencies, focusing on data sovereignty and zero-trust access.", img: "https://images.unsplash.com/photo-1555529363-22877373d328?q=80&w=1000&auto=format&fit=crop" },
+                legal: { title: "Legal", text: "Hardening security for top-tier law firms and corporate legal departments to ensure absolute client confidentiality.", img: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1000&auto=format&fit=crop" }
+            };
+            const data = indData[key];
+            document.querySelectorAll('.ind-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const panel = document.getElementById('ind-panel');
+            gsap.to(panel, { opacity: 0, scale: 0.98, duration: 0.3, onComplete: () => {
+                document.getElementById('ind-title').innerText = data.title;
+                document.getElementById('ind-text').innerText = data.text;
+                document.getElementById('ind-img').src = data.img;
+                gsap.to(panel, { opacity: 1, scale: 1, duration: 0.5 });
+            }});
+        }
+
+        function toggleFaq(btn) {
+            const item = btn.parentElement;
+            const wasActive = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            if (!wasActive) item.classList.add('active');
+        }
+
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.gs-fade').forEach(el => {
+                gsap.from(el, { opacity: 0, y: 30, duration: 1, scrollTrigger: { trigger: el, start: "top 90%" } });
+            });
+            gsap.from('.gs-left', { opacity: 0, x: -50, duration: 1.2, scrollTrigger: { trigger: '.gs-left', start: "top 80%" } });
+            gsap.from('.gs-right', { opacity: 0, x: 50, duration: 1.2, scrollTrigger: { trigger: '.gs-right', start: "top 80%" } });
+            gsap.utils.toArray('.gs-up').forEach(el => {
+                gsap.from(el, { opacity: 0, y: 50, duration: 1, scrollTrigger: { trigger: el, start: "top 95%" } });
+            });
+            document.querySelectorAll('.count').forEach(counter => {
+                const target = +counter.getAttribute('data-val');
+                const suffix = counter.getAttribute('data-suffix') || "";
+                gsap.to({ val: 0 }, {
+                    val: target, duration: 2.5, ease: "power2.out",
+                    scrollTrigger: { trigger: counter, start: "top 90%" },
+                    onUpdate: function() { counter.innerHTML = Math.floor(this.targets()[0].val) + suffix; }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

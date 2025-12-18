@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>DXSO Premium | Global Managed SOC & SIEM Operations</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    
+    <!-- Professional Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            --brand-accent: #10b981;
+            --brand-accent-glow: rgba(16, 185, 129, 0.12);
+            --brand-bg: #020617;
+            --brand-surface: rgba(15, 23, 42, 0.4);
+            --brand-surface-bright: rgba(30, 41, 59, 0.5);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(16px);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--brand-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- BACKGROUND --- */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+            z-index: 0; pointer-events: none;
+        }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px; z-index: 1; pointer-events: none; opacity: 0.15;
+        }
+
+        /* --- UTILITIES --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+        .section { padding: 100px 0; position: relative; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .text-accent { color: var(--brand-accent); }
+        h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.03em; color: white; }
+
+        .tagline {
+            display: inline-flex; align-items: center; gap: 12px;
+            font-family: 'JetBrains Mono'; font-size: 0.65rem; font-weight: 700;
+            color: var(--brand-accent); text-transform: uppercase; letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        .tagline::before { content: ""; width: 24px; height: 1px; background: var(--brand-accent); opacity: 0.5; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 14px 32px; background: var(--brand-accent); color: var(--brand-bg);
+            font-weight: 700; font-size: 0.8rem; border-radius: 4px;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; gap: 10px;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none;
+        }
+        .btn:hover { transform: translateY(-2px); background: #14cf91; box-shadow: 0 12px 24px -10px var(--brand-accent-glow); }
+        
+        .btn-outline {
+            background: transparent; border: 1px solid var(--border); color: white;
+            backdrop-filter: var(--glass-blur);
+        }
+        .btn-outline:hover { border-color: var(--brand-accent); background: rgba(16, 185, 129, 0.04); }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 24px 0; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.6rem; font-weight: 800; color: white; letter-spacing: -1.5px; text-decoration: none; }
+        .logo span { color: var(--brand-accent); font-weight: 300; }
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-link { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; text-decoration: none; letter-spacing: 1px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: white; }
+
+        /* --- HERO --- */
+        .hero { padding: 200px 0 100px; text-align: center; }
+        .hero-title { font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1.05; margin-bottom: 24px; font-weight: 800; }
+        .hero-desc { font-size: 1.15rem; color: var(--text-muted); max-width: 760px; margin: 0 auto 48px; font-weight: 300; line-height: 1.6; }
+
+        /* --- PILLARS --- */
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 80px; }
+        .pillar-item { padding: 24px; border-left: 1px solid var(--border); }
+        .pillar-item h4 { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--brand-accent); margin-bottom: 8px; letter-spacing: 1px; }
+        .pillar-item p { font-size: 0.85rem; color: var(--text-muted); font-weight: 300; line-height: 1.5; }
+
+        /* --- ARCHITECTURE --- */
+        .arch-container { 
+            background: #01040a; border: 1px solid var(--border); border-radius: 12px;
+            padding: 60px 40px; position: relative; overflow: hidden;
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6);
+        }
+        .arch-svg { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
+        
+        .svg-node { fill: #0f172a; stroke: var(--border); stroke-width: 1; rx: 6; }
+        .svg-node-prime { fill: rgba(16, 185, 129, 0.03); stroke: var(--brand-accent); stroke-width: 1.2; rx: 10; }
+        .svg-t1 { font-family: 'Inter'; font-size: 13px; fill: white; text-anchor: middle; font-weight: 500; }
+        .svg-t2 { font-family: 'JetBrains Mono'; font-size: 16px; fill: var(--brand-accent); text-anchor: middle; font-weight: 700; }
+        .svg-t3 { font-family: 'Inter'; font-size: 10px; fill: var(--text-muted); text-anchor: middle; }
+        .pulse-line { stroke: var(--brand-accent); stroke-width: 1.2; stroke-dasharray: 8; animation: dash 2.5s linear infinite; opacity: 0.6; }
+        @keyframes dash { to { stroke-dashoffset: 20; } }
+
+        /* --- CAPABILITIES --- */
+        .cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .cap-card {
+            background: var(--brand-surface); border: 1px solid var(--border);
+            padding: 40px 32px; border-radius: 4px; backdrop-filter: var(--glass-blur);
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cap-card:hover { border-color: rgba(16, 185, 129, 0.3); transform: translateY(-8px); background: var(--brand-surface-bright); }
+        .cap-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--brand-accent); margin-bottom: 24px; transition: 0.3s; }
+        .cap-card h3 { font-size: 1.25rem; margin-bottom: 12px; }
+        .cap-card p { color: var(--text-muted); font-size: 0.9rem; font-weight: 300; line-height: 1.7; }
+
+        /* --- SPECS --- */
+        .specs-wrap { background: var(--brand-surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; backdrop-filter: var(--glass-blur); }
+        .spec-item { display: grid; grid-template-columns: 1fr 1.5fr; padding: 24px 48px; border-bottom: 1px solid var(--border); align-items: center; }
+        .spec-item:last-child { border-bottom: none; }
+        .spec-label { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--brand-accent); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+        .spec-value { color: white; font-size: 1rem; font-weight: 300; text-align: right; }
+
+        /* --- CTA --- */
+        .cta-section { padding: 120px 0; border-top: 1px solid var(--border); text-align: center; }
+        .cta-content h2 { font-size: 2.8rem; margin-bottom: 20px; }
+        .cta-content p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* --- FOOTER --- */
+        footer { padding: 80px 0 40px; background: #01040a; border-top: 1px solid var(--border); }
+        .f-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; }
+        .f-col h5 { font-size: 0.65rem; color: var(--brand-accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; }
+        .f-link { display: block; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; transition: 0.3s; }
+        .f-link:hover { color: white; transform: translateX(5px); }
+
+        @media (max-width: 1024px) {
+            .cap-grid, .f-grid { grid-template-columns: repeat(2, 1fr); }
+            .pillars-grid { grid-template-columns: 1fr; gap: 0; }
+            .pillar-item { border-left: none; border-bottom: 1px solid var(--border); padding: 24px 0; }
+        }
+        @media (max-width: 768px) {
+            .cap-grid, .f-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .spec-item { grid-template-columns: 1fr; gap: 8px; padding: 24px; }
+            .spec-value { text-align: left; }
+            .arch-container { padding: 40px 20px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-mesh"></div>
+    <div class="bg-grid"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-flex">
+            <a href="index.html" class="logo">DX<span>SO</span></a>
+            <div class="nav-links">
+                <a href="index1.html" class="nav-link">Platform</a>
+                <a href="service-protect.html" class="nav-link">Protect</a>
+                <a href="service-elite.html" class="nav-link">Elite</a>
+                <a href="service-premium.html" class="nav-link active">Premium</a>
+                <a href="index.html#contact" class="nav-link">Support</a>
+            </div>
+            <a href="#contact" class="btn btn-outline" style="padding: 10px 24px; font-size: 0.7rem;">Client Portal</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="tagline gs-fade">Mission-Critical Defense</div>
+            <h1 class="hero-title gs-up">DXSO Premium</h1>
+            <p class="hero-desc gs-up">
+                Total Security Orchestration. A full-spectrum managed security operation delivering 24/7 human-led monitoring, advanced SIEM correlation, and automated SOAR response for enterprise and government-scale infrastructures.
+            </p>
+            <div class="gs-up">
+                <a href="#contact" class="btn">Initiate SOC Command <i data-lucide="activity"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pillars -->
+    <section class="container">
+        <div class="pillars-grid gs-up">
+            <div class="pillar-item">
+                <h4>01 / 24x7 HUMAN VIGILANCE</h4>
+                <p>Global SOC analysts providing real-time oversight and active threat neutralization around the clock.</p>
+            </div>
+            <div class="pillar-item">
+                <h4>02 / FULL STACK SIEM</h4>
+                <p>Consolidate every log, identity, and cloud event into a unified behavioral analytics engine.</p>
+            </div>
+            <div class="pillar-item">
+                <h4>03 / SOAR ORCHESTRATION</h4>
+                <p>Automated playbooks that execute complex containment actions in milliseconds across your entire estate.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="section" style="background: rgba(2,6,23,0.3);">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 60px;">
+                <div class="tagline">SOC TOPOLOGY</div>
+                <h2 style="font-size: 2.5rem;">Managed Operations Hub</h2>
+            </div>
+            
+            <div class="arch-container gs-up">
+                <svg class="arch-svg" viewBox="0 0 900 650" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Data Flow Lines -->
+                    <path d="M100,550 L450,480 M260,550 L450,480 M420,550 L450,480 M580,550 L450,480 M740,550 L450,480" stroke="#1e293b" stroke-width="1" fill="none"/>
+                    <path d="M450,380 L450,350" class="pulse-line" fill="none"/>
+                    <path d="M450,250 L450,220" class="pulse-line" fill="none"/>
+                    
+                    <!-- Bottom Sources -->
+                    <rect x="50" y="550" width="100" height="50" class="svg-node" /> <text x="100" y="580" class="svg-t1">Endpoint</text>
+                    <rect x="210" y="550" width="100" height="50" class="svg-node" /> <text x="260" y="580" class="svg-t1">Servers</text>
+                    <rect x="370" y="550" width="100" height="50" class="svg-node" /> <text x="420" y="580" class="svg-t1">Network</text>
+                    <rect x="530" y="550" width="100" height="50" class="svg-node" /> <text x="580" y="580" class="svg-t1">Cloud</text>
+                    <rect x="690" y="550" width="100" height="50" class="svg-node" /> <text x="740" y="580" class="svg-t1">IoT/OT</text>
+
+                    <!-- Collection Layer -->
+                    <rect x="250" y="380" width="400" height="100" class="svg-node" />
+                    <text x="450" y="410" class="svg-t1">Unified Data Ingestion</text>
+                    <text x="350" y="440" class="svg-t3">Agents</text>
+                    <text x="450" y="440" class="svg-t3">Syslog</text>
+                    <text x="550" y="440" class="svg-t3">Cloud API</text>
+
+                    <!-- SIEM Layer -->
+                    <rect x="250" y="250" width="400" height="100" class="svg-node-prime" />
+                    <text x="450" y="285" class="svg-t2">CORE SIEM ANALYTICS</text>
+                    <text x="320" y="315" class="svg-t3">Correlation</text>
+                    <text x="450" y="315" class="svg-t3">UEBA logic</text>
+                    <text x="580" y="315" class="svg-t3">ML Detection</text>
+
+                    <!-- SOAR Layer -->
+                    <rect x="250" y="120" width="400" height="100" class="svg-node" />
+                    <text x="450" y="150" class="svg-t1">SOAR AUTOMATION</text>
+                    <text x="320" y="180" class="svg-t3">Playbooks</text>
+                    <text x="580" y="180" class="svg-t3">Auto-Remedy</text>
+
+                    <!-- SOC Overlay -->
+                    <rect x="300" y="10" width="400" height="70" class="svg-node" stroke-dasharray="4,4" />
+                    <text x="500" y="50" class="svg-t2" style="font-size:14px; fill:white; opacity:0.8;">GLOBAL SOC ANALYST OVERRIDE</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Capabilities -->
+    <section class="section">
+        <div class="container">
+            <div style="margin-bottom: 60px;">
+                <div class="tagline">ENTERPRISE MATRIX</div>
+                <h2 style="font-size: 2.5rem;">Managed SOC Capabilities</h2>
+            </div>
+            
+            <div class="cap-grid">
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="database"></i></div>
+                    <h3>Unified SIEM</h3>
+                    <p>Centralized log management and multi-vector correlation across endpoints, network, identities, and multi-cloud environments.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="bot"></i></div>
+                    <h3>SOAR Automation</h3>
+                    <p>Custom-built playbooks that trigger near-instant remediation actions—like network isolation or credential resets—without human delay.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="search"></i></div>
+                    <h3>Advanced Threat Hunting</h3>
+                    <p>Proactive, hypothesis-driven human hunting sessions to discover sophisticated "silent" threats that bypass automated logic.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="user-check"></i></div>
+                    <h3>UEBA Intelligence</h3>
+                    <p>User and Entity Behavior Analytics to baseline normal activity and flag anomalies indicative of insider threats or stolen identities.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="shield-alert"></i></div>
+                    <h3>Incident Response</h3>
+                    <p>End-to-end management of critical security events, including deep-dive forensics, data recovery support, and remediation strategy.</p>
+                </div>
+                <div class="cap-card gs-up">
+                    <div class="cap-icon"><i data-lucide="file-bar-chart"></i></div>
+                    <h3>Executive Reporting</h3>
+                    <p>Bespoke compliance dashboards and strategic ROI reporting tailored for Board-level and CISO visibility.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specs -->
+    <section class="section" style="background: rgba(2,6,23,0.2);">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <div class="tagline">OPERATIONAL BENCHMARKS</div>
+                <h2 style="font-size: 2.5rem;">Technical Framework</h2>
+            </div>
+            
+            <div class="specs-wrap gs-up">
+                <div class="spec-item">
+                    <span class="spec-label">Target Infrastructure</span>
+                    <span class="spec-value">Large Enterprise & Government (5,000+ Distributed Nodes)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Service Model</span>
+                    <span class="spec-value">Fully Managed MSSP (Managed Security Service Provider)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Data Retention</span>
+                    <span class="spec-value">1 Year + Compliant Log Storage (Hot/Warm/Cold Storage)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Response SLA</span>
+                    <span class="spec-value">Critical Triage & Incident Start &lt; 15 Minutes</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Governance Mapping</span>
+                    <span class="spec-value">Full NIST, PCI-DSS, HIPAA, and GDPR Regulatory Compliance</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Support Access</span>
+                    <span class="spec-value">Dedicated Technical Account Manager (TAM) & Lead Analyst</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content gs-up">
+                <div class="tagline" style="justify-content: center;">Establish Total Command</div>
+                <h2>Deploy Full-Spectrum Defense</h2>
+                <p>Empower your organization with military-grade SOC capabilities. Move beyond fragmented security to a unified, mission-ready defensive posture.</p>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <a href="index.html#contact" class="btn">Establish Secure Uplink <i data-lucide="mail"></i></a>
+                    <a href="index.html" class="btn btn-outline">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="f-grid">
+                <div class="f-col">
+                    <a href="index.html" class="logo" style="font-size: 1.4rem;">DX<span>SO</span></a>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 24px; max-width: 280px;">The definitive standard in global enterprise cybersecurity. Military DNA, Precision Response.</p>
+                </div>
+                <div class="f-col">
+                    <h5>PLATFORM</h5>
+                    <a href="service-protect.html" class="f-link">DXSO Protect</a>
+                    <a href="service-elite.html" class="f-link">DXSO Elite</a>
+                    <a href="service-premium.html" class="f-link">DXSO Premium</a>
+                </div>
+                <div class="f-col">
+                    <h5>RESOURCES</h5>
+                    <a href="#" class="f-link">Security Whitepapers</a>
+                    <a href="#" class="f-link">Global Compliance</a>
+                    <a href="#" class="f-link">Intelligence Feed</a>
+                </div>
+                <div class="f-col">
+                    <h5>COMPANY</h5>
+                    <a href="#" class="f-link">Tactical Mission</a>
+                    <a href="#" class="f-link">Legal / SLA</a>
+                    <a href="#" class="f-link">Contact Ops</a>
+                </div>
+            </div>
+            <div style="margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); text-align: center; font-size: 0.7rem; color: #475569; letter-spacing: 1px; text-transform: uppercase;">
+                &copy; 2025 DXSO International. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.onload = () => {
+            lucide.createIcons();
+            gsap.registerPlugin(ScrollTrigger);
+            
+            gsap.utils.toArray('.gs-up').forEach(el => {
+                gsap.from(el, { 
+                    opacity: 0, y: 30, duration: 1.2, 
+                    ease: "power2.out",
+                    scrollTrigger: { trigger: el, start: "top 95%" } 
+                });
+            });
+
+            gsap.utils.toArray('.gs-fade').forEach(el => {
+                gsap.from(el, { 
+                    opacity: 0, duration: 1.5, 
+                    scrollTrigger: { trigger: el, start: "top 95%" } 
+                });
+            });
+        };
+    </script>
+</body>
+</html>
