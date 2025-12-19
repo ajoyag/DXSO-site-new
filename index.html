@@ -192,49 +192,73 @@
         .hero p { font-size: clamp(1rem, 2vw, 1.1rem); color: var(--text-muted); max-width: 750px; margin: 0 auto 56px; font-weight: 300; }
         .hero h1 span { color: var(--brand-accent); }
 
-        /* --- STATS STRIP --- */
+        /* --- UPDATED STATS SECTION --- */
         .stats-strip {
-            overflow: hidden;
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.4);
             border-top: 1px solid var(--border); 
             border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.01);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
         }
+
+        /* Desktop Grid - Full Viewport Width */
         .stats-track {
-            display: grid; 
+            display: grid;
             grid-template-columns: repeat(6, 1fr);
             width: 100%;
         }
-        .stat-box { padding: 50px 15px; text-align: center; border-right: 1px solid var(--border); }
-        .stat-box:last-child { border-right: none; }
-        .stat-box h3 { font-size: clamp(1.8rem, 4vw, 2.8rem); color: white; margin-bottom: 8px; font-weight: 200; white-space: nowrap; }
-        .stat-box p { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--brand-accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
-        
-        /* Duplicated elements for marquee */
-        .m-dup { display: none; }
 
-        /* --- ABOUT & WHITEPAPER --- */
-        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-        .whitepaper-card {
-            margin-top: 100px;
-            background: var(--brand-surface);
-            border: 1px solid var(--border);
-            padding: 40px;
+        .stat-box {
+            padding: 60px 20px;
+            text-align: center;
+            border-right: 1px solid var(--border);
             display: flex;
-            align-items: center;
-            gap: 40px;
-            border-radius: 4px;
-            backdrop-filter: var(--glass-blur);
+            flex-direction: column;
+            justify-content: center;
+            transition: 0.3s;
         }
-        .wp-icon { 
-            width: 64px; 
-            height: 64px; 
-            background: var(--brand-accent-glow); 
-            border-radius: 4px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .stat-box:last-child { border-right: none; }
+        .stat-box:hover { background: rgba(16, 185, 129, 0.05); }
+
+        .stat-box h3 { 
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem); 
+            color: white; 
+            margin-bottom: 8px; 
+            font-weight: 200; 
+            line-height: 1;
+        }
+        .stat-box p { 
+            font-family: 'JetBrains Mono'; 
+            font-size: 0.65rem; 
             color: var(--brand-accent); 
-            flex-shrink: 0; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            opacity: 0.8;
+        }
+
+        /* Mobile Marquee Logic (Active under 1024px) */
+        @media (max-width: 1024px) {
+            .stats-track {
+                display: flex;
+                width: max-content;
+                grid-template-columns: none;
+                animation: marquee-stats 40s linear infinite;
+            }
+            .stat-box {
+                width: 250px;
+                flex-shrink: 0;
+                border-bottom: none !important;
+            }
+            .m-dup { display: flex; } /* Show the duplicate boxes for seamless loop */
+        }
+
+        @keyframes marquee-stats {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         /* --- SERVICE CARDS --- */
@@ -631,7 +655,7 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Stats Section - UPDATED TO SPAN FULL WIDTH -->
     <div class="stats-strip">
         <div class="stats-track">
             <!-- Set 1 -->
@@ -659,28 +683,28 @@
                 <h3>ZERO</h3>
                 <p>TRUST ARCHITECTURE</p>
             </div>
-            <!-- Set 2 -->
-            <div class="stat-box m-dup">
+            <!-- Set 2 (Marquee duplicates) -->
+            <div class="stat-box m-dup" style="display: none;">
                 <h3 class="count" data-val="500" data-suffix="T">0T</h3>
                 <p>DATA ANALYZED</p>
             </div>
-            <div class="stat-box m-dup">
+            <div class="stat-box m-dup" style="display: none;">
                 <h3 class="count" data-val="200" data-suffix="ms">0ms</h3>
                 <p>RESPONSE TIME</p>
             </div>
-            <div class="stat-box m-dup">
+            <div class="stat-box m-dup" style="display: none;">
                 <h3 class="count" data-val="100" data-suffix="%">0%</h3>
                 <p>UPTIME GUARANTEE</p>
             </div>
-            <div class="stat-box m-dup">
+            <div class="stat-box m-dup" style="display: none;">
                 <h3>24/7</h3>
                 <p>SOC MONITORING</p>
             </div>
-            <div class="stat-box m-dup">
+            <div class="stat-box m-dup" style="display: none;">
                 <h3 class="count" data-val="100" data-suffix="%">0%</h3>
                 <p>THREAT VISIBILITY</p>
             </div>
-            <div class="stat-box m-dup">
+            <div class="stat-box m-dup" style="display: none;">
                 <h3>ZERO</h3>
                 <p>TRUST ARCHITECTURE</p>
             </div>
@@ -1196,6 +1220,13 @@
             "UPDATING BLOCKLISTS... [DONE]",
             "SYSTEM STATUS: OPTIMIZED"
         ];
+
+        function setupMarquee() {
+            // Detect mobile/tablet screens and unhide the duplicate boxes for the scroll
+            if (window.innerWidth <= 1024) {
+            document.querySelectorAll('.m-dup').forEach(el => el.style.display = 'flex');
+            }
+        }
 
         window.onload = () => {
             if (isInitialized) return;
