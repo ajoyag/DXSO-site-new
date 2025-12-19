@@ -606,6 +606,73 @@
             .hero-btns { flex-direction: column; gap: 15px; }
             .btn { width: 100%; }
         }
+                /* Whitepaper Card Refined */
+        .whitepaper-card {
+            background: var(--brand-surface);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 4px;
+            margin-top: 60px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            backdrop-filter: var(--glass-blur);
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle left accent bar that appears on hover */
+        .whitepaper-card::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--brand-accent);
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .whitepaper-card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: var(--brand-surface-bright);
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+        }
+
+        .whitepaper-card:hover::before {
+            opacity: 1;
+        }
+
+        .wp-icon { 
+            font-size: 2.5rem; 
+            color: var(--brand-accent); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 60px; 
+            height: 60px; 
+            background: rgba(16, 185, 129, 0.05); 
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            border-radius: 4px; 
+            transition: 0.3s;
+        }
+
+        .whitepaper-card:hover .wp-icon {
+            background: var(--brand-accent-glow);
+            transform: scale(1.1) rotate(-5deg);
+            border-color: var(--brand-accent);
+        }
+
+        .wp-content { flex: 1; }
+        .wp-title { font-size: 1.3rem; margin-bottom: 10px; font-weight: 600; color: white; }
+        .wp-desc { color: var(--text-muted); font-size: 0.95rem; font-weight: 300; line-height: 1.6; }
+
+        @media (max-width: 768px) {
+            .whitepaper-card { flex-direction: column; text-align: center; padding: 40px 25px; }
+            .wp-icon { margin-bottom: 10px; }
+            .whitepaper-card::before { width: 100%; height: 3px; top: 0; bottom: auto; }
+        }
     </style>
 </head>
 
@@ -714,13 +781,13 @@
     <!-- About Section -->
     <section id="about" class="section">
         <div class="container">
-            <div class="about-grid">
+            <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px;">
                 <div class="gs-left">
                     <div class="tagline">ABOUT DXSO</div>
                     <h2 style="font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.2; margin-bottom: 30px;">Your Tactical <br>Defense Partner</h2>
                     <p style="color: white; font-size: 1.05rem; margin-bottom: 15px; font-weight:500;">We are not just a vendor; we are your tactical defense partner.</p>
                     <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 15px; font-weight:300;">In an era where digital threats evolve daily, DXSO stands as the barrier between your data and compromise.</p>
-                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; font-weight:300;">Founded by military-grade intelligence experts, we translate high-level security protocols into scalable business solutions. Whether you are an SMB needing endpoint protection or an Enterprise requiring full-scale SOC operations, <strong>we scale with you.</strong></p>
+                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; font-weight:300;">Founded by military-grade intelligence experts, we translate high-level security protocols into scalable business solutions.</p>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
                         <div style="border-left: 1px solid var(--brand-accent); padding-left: 20px;">
@@ -729,7 +796,7 @@
                         </div>
                         <div style="border-left: 1px solid var(--brand-accent); padding-left: 20px;">
                             <h4 style="margin-bottom: 6px; font-size: 1rem;">Elastic Scale</h4>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Infrastructure that expands from SMB to global Fortune 500.</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Infrastructure that expands from SMB to Global Fortune 500.</p>
                         </div>
                     </div>
                 </div>
@@ -737,15 +804,16 @@
                     <div class="intel-container" id="intel-feed"></div>
                 </div>
             </div>
+            <br>
 
-            <!-- Whitepaper Interactive Card -->
+            <!-- Whitepaper Interactive Card Refined -->
             <div class="whitepaper-card gs-up">
                 <div class="wp-icon"><i data-lucide="file-text"></i></div>
-                <div style="flex: 1;">
-                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">2025 State of Global Cybersecurity</h3>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; font-weight:300;">Strategic report on ransomware evolution, nation-state actor profiles, and the impact of generative AI on social engineering.</p>
+                <div class="wp-content">
+                    <h3 class="wp-title">2025 State of Global Cybersecurity</h3>
+                    <p class="wp-desc">Strategic report on ransomware evolution, nation-state actor profiles, and the impact of generative AI on social engineering.</p>
                 </div>
-                <a href="#" class="btn btn-outline" style="white-space: nowrap;">Download PDF</a>
+                <a href="#" class="btn btn-outline">Download PDF <i data-lucide="download" size="16"></i></a>
             </div>
         </div>
     </section>
@@ -1392,4 +1460,3 @@
     </script>
 </body>
 </html>
-
